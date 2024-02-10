@@ -32,11 +32,34 @@
 typedef unsigned short  move;
 typedef char            square;
 typedef struct Brd      Brd;
+typedef struct Pos      Pos;
+typedef struct PosInfo  PosInfo;
+typedef unsigned char   castle_info;
 
 struct Brd
 {
-    square board[BRD_NSQUARES];
+    square              board[BRD_NSQUARES];
 };
+
+struct Pos
+{
+    Brd                 brd;
+    move                last_move;
+    castle_info         wci;
+    castle_info         bci;
+};
+
+struct PosInfo
+{
+    bfd64               w_attack_mask;
+    bfd64               b_attack_mask;
+};
+
+void                    ci_left_rook_moved(castle_info * ci);
+void                    ci_right_rook_moved(castle_info * ci);
+void                    ci_king_moved(castle_info * ci);
+bool                    ci_can_castle_left(castle_info ci);
+bool                    ci_can_castle_right(castle_info ci);
 
 bool                    square_white_piece(square sqr);
 bool                    square_black_piece(square sqr);
@@ -91,7 +114,10 @@ Brd                     Brd_new_empty(void);
 Brd                     Brd_from_cstr(const char * cstr);
 Brd                     Brd_new_default(void);
 
-bfd64 mask_shift(bfd64 * mask, int vert, int hor);
+Pos                     Pos_new_default(void);
+
+PosInfo                 PosInfo_compute(const Pos * pos);
+
 bfd64                   mask_Brd(const Brd * board);
 bfd64                   mask_white(const Brd * board);
 bfd64                   mask_black(const Brd * board);
@@ -101,5 +127,6 @@ bfd64                   mask_attack_mask_row_col(const Brd * brd, int row, int c
 void                    dbg_Brd(const Brd * board);
 void                    dbg_mask(bfd64 r);
 void                    dbg_mask_numeric(bfd64 msk);
+void                    dbg_PosInfo(const PosInfo * pi);
 
 #endif

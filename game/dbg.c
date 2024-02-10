@@ -48,3 +48,9 @@ void dbg_mask(bfd64  msk)
     }
     nl_;
 }
+
+void dbg_PosInfo(const PosInfo * pi)
+{
+    dbg_mask(pi->w_attack_mask);
+    dbg_mask(pi->b_attack_mask);
+}
