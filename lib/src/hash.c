@@ -1,6 +1,6 @@
 #include "../mylib.h"
 
-u64 hash_fnv(const char * bytes, i64 size)
+u64 hash_fnv(const unsigned char * bytes, i64 size)
 {
     const u64   FNV_PRIME = 0x00000100000001B3;
     u64         hash =      0xcbf29ce484222325;

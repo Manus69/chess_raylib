@@ -34,3 +34,8 @@ bfd64 bfd64_toggle(bfd64 * bfd, int idx)
 {
     return * bfd ^= (1ul << idx);
 }
+
+bfd64 bfd64_union(bfd64 lhs, bfd64 rhs)
+{
+    return lhs | rhs;
+}

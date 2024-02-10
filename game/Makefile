@@ -11,6 +11,6 @@ $(obj_dir)/%.o : %.c $(headers)
 all: $(objs)
 
 rm:
-	rm -f $(objs)
+	rm -f $(obj_dir)/*
 
 re: rm all	

@@ -4,7 +4,7 @@
 #include "../lib/mylib.h"
 #include "Game.h"
 
-#define DBG_SQUARE_EMPTY    SQ_ES
+#define DBG_SQUARE_EMPTY    BRD_ES
 #define DBG_SQUARE_NE       'x'
 
 void Brd_dbg_dump(void * target, const Brd * brd)
@@ -24,13 +24,13 @@ void dbg_Brd(const Brd * board)
     nl_;
 }
 
-void dbg_mask_numeric(mask msk)
+void dbg_mask_numeric(bfd64  msk)
 {
     printf("%lx\n", msk);
     nl_;
 }
 
-static void _dbg_mask_slice(mask msk, int idx)
+static void _dbg_mask_slice(bfd64  msk, int idx)
 {
     char buff[] = {DBG_SQUARE_EMPTY, DBG_SQUARE_NE};
 
@@ -40,7 +40,7 @@ static void _dbg_mask_slice(mask msk, int idx)
     }
 }
 
-void dbg_mask(mask msk)
+void dbg_mask(bfd64  msk)
 {
     for (int k = 0; k < BRD_SIZE; k ++)
     {
