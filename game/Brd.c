@@ -7,6 +7,18 @@ int Brd_row_col_idx(int row, int col)
     return row * BRD_SIZE + col;
 }
 
+int Brd_idx_shift(int idx, int n_rows, int n_cols)
+{
+    if (Brd_idx_col(idx) + n_cols < 0) return NO_IDX;
+
+    return idx + n_rows * BRD_SIZE + n_cols;
+}
+
+bool Brd_idx_valid(int idx)
+{
+    return idx >= 0 && idx < BRD_NSQUARES;
+}
+
 int Brd_idx_row(int idx)
 {
     return idx / BRD_SIZE;
@@ -15,6 +27,31 @@ int Brd_idx_row(int idx)
 int Brd_idx_col(int idx)
 {
     return idx % BRD_SIZE;
+}
+
+bool Brd_last_row(int row)
+{
+    return row == BRD_SIZE - 1;
+}
+
+bool Brd_row_margin2(int row)
+{
+    return row >= BRD_SIZE - 2;
+}
+
+bool Brd_last_col(int col)
+{
+    return col == BRD_SIZE - 1;
+}
+
+bool Brd_col_margin2(int col)
+{
+    return col >= BRD_SIZE - 2;
+}
+
+bool Brd_row_col_valid(int row, int col)
+{
+    return row >= 0 && row < BRD_SIZE && col >= 0 && col < BRD_SIZE;
 }
 
 square * Brd_get(const Brd * brd, int idx)
@@ -27,54 +64,14 @@ square * Brd_get_row_col(const Brd * brd, int row, int col)
     return Brd_get(brd, Brd_row_col_idx(row, col));
 }
 
-bool Brd_white_piece(const Brd * brd, int idx)
-{
-    return square_is_white_piece(* Brd_get(brd, idx));
-}
-
-bool Brd_white_piece_row_col(const Brd * brd, int row, int col)
-{
-    return Brd_white_piece(brd, Brd_row_col_idx(row, col));
-}
-
-bool Brd_black_piece(const Brd * brd, int idx)
-{
-    return square_is_black_piece(* Brd_get(brd, idx));
-}
-
-bool Brd_black_piece_row_col(const Brd * brd, int row, int col)
-{
-    return Brd_black_piece(brd, Brd_row_col_idx(row, col));
-}
-
-bool Brd_empty_square(const Brd * brd, int idx)
-{
-    return square_no_piece(* Brd_get(brd, idx));
-}
-
-bool Brd_empty_square_row_col(const Brd * brd, int row, int col)
-{
-    return Brd_empty_square(brd, Brd_row_col_idx(row, col));
-}
-
-bool Brd_white_pawn(const Brd * brd, int idx)
-{
-    return square_white_pawn(* Brd_get(brd, idx));
-}
-
-bool Brd_white_pawn_row_col(const Brd * brd, int row, int col)
-{
-    return Brd_white_pawn(brd, Brd_row_col_idx(row, col));
-}
-
-bool Brd_black_pawn(const Brd * brd, int idx)
-{
-
-}
-
 void Brd_set(Brd * brd, int idx, square val)
 {
     * Brd_get(brd, idx) = val;
+}
+
+void Brd_set_row_col(Brd * brd, int row, int col, square val)
+{
+    Brd_set(brd, Brd_row_col_idx(row, col), val);
 }
 
 void Brd_move_idx(Brd * brd, int from, int to)

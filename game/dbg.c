@@ -27,7 +27,6 @@ void dbg_Brd(const Brd * board)
 void dbg_mask_numeric(bfd64  msk)
 {
     printf("%lx\n", msk);
-    nl_;
 }
 
 static void _dbg_mask_slice(bfd64  msk, int idx)
@@ -47,4 +46,5 @@ void dbg_mask(bfd64  msk)
         _dbg_mask_slice(msk, k);
         nl_;
     }
+    nl_;
 }

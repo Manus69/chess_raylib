@@ -21,11 +21,14 @@ u32 utl_rng_spcg(u64 * state);
 u64 utl_rng_xor(u64 * state);
 
 bfd64 bfd64_zeroes(void);
+bfd64 bfd64_one(int idx);
 bfd64 bfd64_ones(void);
 bfd64 bfd64_from_hex(u64 x);
 bfd64 bfd64_set(bfd64 * bfd, int idx);
 bfd64 bfd64_clear(bfd64 * bfd, int idx);
 bfd64 bfd64_toggle(bfd64 * bfd, int idx);
+bfd64 bfd64_shift_left(bfd64 * bfd, int shift);
+bfd64 bfd64_shift_right(bfd64 * bfd, int shift);
 bool bfd64_bit_is_set(bfd64 bfd, int idx);
 bfd64 bfd64_union(bfd64 lhs, bfd64 rhs);
 

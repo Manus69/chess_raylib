@@ -4,21 +4,18 @@
 
 int main()
 {
-    Brd b = Brd_new_default();
-    dbg_Brd(& b);
+    // Brd brd = Brd_new_default();
 
-    bfd64 msk = mask_Brd(& b);
-    dbg_mask_numeric(msk);
-    dbg_mask(msk);
+    // bfd64 msk = mask_attack_mask_row_col(& brd, 0, 1);
+    // dbg_mask(msk);
+    // dbg_mask_numeric(msk);
 
-    msk = mask_white(& b);
-    dbg_mask(msk);
+    Brd brd = Brd_new_empty();
+    Brd_set_row_col(& brd, 3, 3, BRD_WQ);
+    Brd_set_row_col(& brd, 1, 3, BRD_WB);
 
-    msk = mask_black(& b);
-    dbg_mask(msk);
-
-    msk = mask_attack_mask_row_col(& b, 6, 7);
-    dbg_mask(msk);
+    bfd64 mask = mask_attack_mask_row_col(& brd, 3, 3);
+    dbg_mask(mask);
 
     return 0;
 }

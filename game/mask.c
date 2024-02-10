@@ -1,97 +1,128 @@
 #include "Game.h"
 
-bfd64 mask_Brd(const Brd * board)
+bfd64 mask_Brd(const Brd * brd)
 {
     bfd64 msk;
 
     msk = 0;
     for (int k = 0; k < BRD_NSQUARES; k ++)
     {
-        if (! Brd_empty_square(board, k)) bfd64_set(& msk, k);
+        if (! square_no_piece(* Brd_get(brd, k))) bfd64_set(& msk, k);
     }
 
     return msk;
 }
 
-bfd64 mask_white(const Brd * board)
+bfd64 mask_white(const Brd * brd)
 {
     bfd64 msk;
 
     msk = 0;
     for (int k = 0; k < BRD_NSQUARES; k ++)
     {
-        if (Brd_white_piece(board, k)) bfd64_set(& msk, k);
+        if (square_white_piece(* Brd_get(brd, k))) bfd64_set(& msk, k);
     }
 
     return msk;
 }
 
-bfd64 mask_black(const Brd * board)
+bfd64 mask_black(const Brd * brd)
 {
     bfd64 msk;
 
     msk = 0;
     for (int k = 0; k < BRD_NSQUARES; k ++)
     {
-        if (Brd_black_piece(board, k)) bfd64_set(& msk, k);
+        if (square_black_piece(* Brd_get(brd, k))) bfd64_set(& msk, k);
     }
 
     return msk;
 }
 
-static bfd64 _attack_mask_wp(const Brd * brd, int row, int col)
+static bfd64 _mask_square(int row, int col)
 {
-    int     left;
-    int     right;
-    bfd64   mask;
-
-    (void) brd;
-    if (row == 0) return 0;
-
-    left = Brd_row_col_idx(row - 1, col - 1);
-    right = Brd_row_col_idx(row - 1, col + 1);
-
-    mask = bfd64_zeroes();
-    if (col == 0) return bfd64_set(& mask, right);
-    if (col == BRD_SIZE - 1) return bfd64_set(& mask, left);
-
-    bfd64_set(& mask, left);
-    bfd64_set(& mask, right);
-
-    return mask;
+    return Brd_row_col_valid(row, col) ? bfd64_one(Brd_row_col_idx(row, col)) : 0;
 }
 
-static bfd64 _attack_mask_bp(const Brd * brd, int row, int col)
+static bfd64 _mask_attack_wp(int row, int col)
 {
-    int     left;
-    int     right;
-    bfd64   mask;
+    return _mask_square(row - 1, col - 1) | _mask_square(row - 1, col + 1);
+}
 
-    (void) brd;
-    if (row == BRD_SIZE - 1) return 0;
+static bfd64 _mask_attack_bp(int row, int col)
+{
+    return _mask_square(row + 1, col - 1) | _mask_square(row + 1, col + 1);
+}
 
-    left = Brd_row_col_idx(row + 1, col - 1);
-    right = Brd_row_col_idx(row + 1, col + 1);
+static bfd64 _mask_attack_king(int row, int col)
+{
+    return _mask_square(row - 1, col - 1) | _mask_square(row - 1, col) | _mask_square(row - 1, col + 1) |
+            _mask_square(row, col - 1) | _mask_square(row, col + 1) |
+            _mask_square(row + 1, col - 1) | _mask_square(row + 1, col) | _mask_square(row + 1, col + 1);
+}
 
-    mask = bfd64_zeroes();
-    if (col == 0) return bfd64_set(& mask, right);
-    if (col == BRD_SIZE - 1) bfd64_set(& mask, left);
+static bfd64 _mask_attack_knight(int row, int col)
+{
+    return _mask_square(row - 2, col - 1) | _mask_square(row - 2, col + 1) |
+            _mask_square(row - 1, col - 2) | _mask_square(row - 1, col + 2) |
+            _mask_square(row + 1, col - 2) | _mask_square(row + 1, col + 2) |
+            _mask_square(row + 2, col - 1) | _mask_square(row + 2, col + 1);
+}
 
-    bfd64_set(& mask, left);
-    bfd64_set(& mask, right);
+#define _mask_gen_(name, row_inc, col_inc) \
+static bfd64 _mask_## name(const Brd * brd, int row, int col) \
+{ \
+    bfd64 mask = _mask_square(row, col); \
+    if (! mask) return 0; \
+    if (! square_no_piece(* Brd_get_row_col(brd, row, col))) return mask; \
+    return mask | _mask_## name(brd, row + row_inc, col + col_inc); \
+}
 
-    return mask;
+_mask_gen_(up, -1, 0)
+_mask_gen_(down, 1, 0)
+_mask_gen_(left, 0, -1)
+_mask_gen_(right, 0, 1)
+_mask_gen_(lu, -1, -1)
+_mask_gen_(ru, -1, 1)
+_mask_gen_(dl, 1, -1)
+_mask_gen_(dr, 1, 1)
+
+static bfd64 _mask_attack_rook(const Brd * brd, int row, int col)
+{
+    return _mask_up(brd, row - 1, col) | _mask_down(brd, row + 1, col) |
+            _mask_left(brd, row, col - 1) | _mask_right(brd, row, col + 1);
+}
+
+static bfd64 _mask_attack_bishop(const Brd * brd, int row, int col)
+{
+    return _mask_lu(brd, row - 1, col - 1) | _mask_ru(brd, row - 1, col + 1) |
+            _mask_dl(brd, row + 1, col - 1) | _mask_dr(brd, row + 1, col + 1);
+}
+
+static bfd64 _mask_attack_queen(const Brd * brd, int row, int col)
+{
+    return _mask_attack_rook(brd, row, col) | _mask_attack_bishop(brd, row, col);
 }
 
 bfd64 mask_attack_mask_row_col(const Brd * brd, int row, int col)
 {
-    if (Brd_empty_square_row_col(brd, row, col)) return bfd64_zeroes();
-    if (Brd_white_pawn_row_col(brd, row, col)) return _attack_mask_wp(brd, row, col);
+    square sqr;
 
-    return bfd64_zeroes();
+    sqr = * Brd_get_row_col(brd, row, col);
+
+    if (square_no_piece(sqr))   return 0;
+    if (square_white_pawn(sqr)) return _mask_attack_wp(row, col);
+    if (square_black_pawn(sqr)) return _mask_attack_bp(row, col);
+    if (square_king(sqr))       return _mask_attack_king(row, col);
+    if (square_rook(sqr))       return _mask_attack_rook(brd, row, col);
+    if (square_knight(sqr))     return _mask_attack_knight(row, col);
+    if (square_bishop(sqr))     return _mask_attack_bishop(brd, row, col);
+    if (square_queen(sqr))      return _mask_attack_queen(brd, row, col);
+
+    return 0;
 }
 
-bfd64 mask_attack_mask(const Brd * brd, int idx)
+bfd64 mask_attack(const Brd * brd, int idx)
 {
     return mask_attack_mask_row_col(brd, Brd_idx_row(idx), Brd_idx_col(idx));
 }
