@@ -105,3 +105,18 @@ Brd Brd_new_default(void)
 {
     return Brd_from_cstr(BRD_DFLT);
 }
+
+Brd Brd_copy(const Brd * brd)
+{
+    return Brd_from_cstr(brd->board);
+}
+
+Brd Brd_new_after_move(const Brd * brd, move mv)
+{
+    Brd new;
+
+    new = Brd_copy(brd);
+    Brd_move(& new, mv);
+
+    return new;
+}

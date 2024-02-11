@@ -3,10 +3,12 @@
 
 #include "../lib/mylib.h"
 
-#define BRD_NO_IDX      (0xFF)
 #define BRD_SIZE        (8)
 #define BRD_NSQUARES    (BRD_SIZE * BRD_SIZE)
-#define BRD_FILECHAR    'a'
+#define BRD_BRL_IP      (0)
+#define BRD_BRR_IP      (BRD_SIZE - 1)
+#define BRD_WRR_IP      (BRD_NSQUARES - 1)
+#define BRD_WRL_IP      (BRD_WRR_IP - BRD_SIZE + 1)
 #define BRD_WR          'r'
 #define BRD_WN          'n'
 #define BRD_WB          'b'
@@ -33,8 +35,16 @@ typedef unsigned short  move;
 typedef char            square;
 typedef struct Brd      Brd;
 typedef struct Pos      Pos;
-typedef struct PosInfo  PosInfo;
+typedef struct BrdInfo  BrdInfo;
 typedef unsigned char   castle_info;
+typedef enum CLR        CLR;
+
+enum CLR
+{
+    CLR_WHITE,
+    CLR_BLACK,
+};
+
 
 struct Brd
 {
@@ -49,10 +59,12 @@ struct Pos
     castle_info         bci;
 };
 
-struct PosInfo
+struct BrdInfo
 {
     bfd64               w_attack_mask;
     bfd64               b_attack_mask;
+    char                w_knig_idx;
+    char                b_king_idx;
 };
 
 void                    ci_left_rook_moved(castle_info * ci);
@@ -81,6 +93,7 @@ bool                    square_knight(square sqr);
 bool                    square_bishop(square sqr);
 bool                    square_queen(square sqr);
 bool                    square_king(square sqr);
+bool                    square_same_color(square lhs, square rhs);
 
 int                     move_get_from(move mv);
 int                     move_get_to(move mv);
@@ -113,20 +126,29 @@ void                    Brd_move(Brd * brd, move mv);
 Brd                     Brd_new_empty(void);
 Brd                     Brd_from_cstr(const char * cstr);
 Brd                     Brd_new_default(void);
+Brd                     Brd_copy(const Brd * brd);
+Brd                     Brd_new_after_move(const Brd * brd, move mv);
 
 Pos                     Pos_new_default(void);
+void                    Pos_move(Pos * pos, move mv);
 
-PosInfo                 PosInfo_compute(const Pos * pos);
+BrdInfo                 BrdInfo_compute(const Brd * brd);
+bool                    BrdInfo_square_attacked_by_white(const BrdInfo * bi, int idx);
+bool                    BrdInfo_square_attacked_by_black(const BrdInfo * bi, int idx);
+bool                    BrdInfo_white_in_check(const BrdInfo * bi);
+bool                    BrdInfo_black_in_check(const BrdInfo * bi);
 
 bfd64                   mask_Brd(const Brd * board);
 bfd64                   mask_white(const Brd * board);
 bfd64                   mask_black(const Brd * board);
-bfd64                   mask_attack_mask(const Brd * brd, int idx);
-bfd64                   mask_attack_mask_row_col(const Brd * brd, int row, int col);
+bfd64                   mask_attack(const Brd * brd, int idx);
+bfd64                   mask_attack_row_col(const Brd * brd, int row, int col);
+bfd64                   mask_move_row_col(const Brd * brd, int row, int col);
+bfd64                   mask_move(const Brd * brd, int idx);
 
 void                    dbg_Brd(const Brd * board);
 void                    dbg_mask(bfd64 r);
 void                    dbg_mask_numeric(bfd64 msk);
-void                    dbg_PosInfo(const PosInfo * pi);
+void                    dbg_PosInfo(const BrdInfo * pi);
 
 #endif

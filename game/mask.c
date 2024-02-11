@@ -104,7 +104,7 @@ static bfd64 _mask_attack_queen(const Brd * brd, int row, int col)
     return _mask_attack_rook(brd, row, col) | _mask_attack_bishop(brd, row, col);
 }
 
-bfd64 mask_attack_mask_row_col(const Brd * brd, int row, int col)
+bfd64 mask_attack_row_col(const Brd * brd, int row, int col)
 {
     square sqr;
 
@@ -124,5 +124,54 @@ bfd64 mask_attack_mask_row_col(const Brd * brd, int row, int col)
 
 bfd64 mask_attack(const Brd * brd, int idx)
 {
-    return mask_attack_mask_row_col(brd, Brd_idx_row(idx), Brd_idx_col(idx));
+    return mask_attack_row_col(brd, Brd_idx_row(idx), Brd_idx_col(idx));
+}
+
+bfd64 _mask_move_wpn(const Brd * brd, int row, int col, int n)
+{
+    return square_no_piece(* Brd_get_row_col(brd, row - n, col)) ? bfd64_one(Brd_row_col_idx(row - n, col)) : 0;
+}
+
+bfd64 _mask_move_bpn(const Brd * brd, int row, int col, int n)
+{
+    return square_no_piece(* Brd_get_row_col(brd, row + n, col)) ? bfd64_one(Brd_row_col_idx(row + n, col)) : 0;
+}
+
+bfd64 _mask_move_wp(const Brd * brd, int row, int col)
+{
+    bfd64 mask;
+
+    if (row == 0) return 0;
+    if (Brd_last_row(row)) return 0;
+
+    mask = _mask_move_wpn(brd, row, col, 1);
+    if (mask && (row == BRD_SIZE - 2)) return mask | _mask_move_wpn(brd, row, col, 2);
+
+    return mask;
+}
+
+bfd64 _mask_move_bp(const Brd * brd, int row, int col)
+{
+    bfd64 mask;
+
+    if (row == 0) return 0;
+    if (Brd_last_row(row)) return 0;
+
+    mask = _mask_move_bpn(brd, row, col, 1);
+    if (mask && row == 1) return mask | _mask_move_bpn(brd, row, col, 2);
+
+    return mask;
+}
+
+bfd64 mask_move_row_col(const Brd * brd, int row, int col)
+{
+    if (square_white_pawn(* Brd_get_row_col(brd, row, col))) return _mask_move_wp(brd, row, col);
+    if (square_black_pawn(* Brd_get_row_col(brd, row, col))) return _mask_move_bp(brd, row, col);
+
+    return mask_attack_row_col(brd, row, col);
+}
+
+bfd64 mask_move(const Brd * brd, int idx)
+{
+    return mask_move_row_col(brd, Brd_idx_row(idx), Brd_idx_col(idx));
 }

@@ -99,3 +99,9 @@ bool square_king(square sqr)
 {
     return square_white_king(sqr) || square_black_king(sqr);
 }
+
+bool square_same_color(square lhs, square rhs)
+{
+    return (square_white_piece(lhs) && square_white_piece(rhs)) ||
+            (square_black_piece(lhs) && square_black_piece(rhs));
+}
