@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./game/Game.h"
+#include "./gui/Gui.h"
 
 int main()
 {
-    Pos pos = Pos_new_default();
-    
+    Gui_run();
 
     return 0;
 }

@@ -71,7 +71,7 @@ bool Pos_move_legal(const Pos * pos, move mv)
 
     if (! (mask & move_get_to(mv)))                     return false;
     
-    return _legal_after_move(pos, mv, turn);
+    return _legal_after_move(pos, mv, turn); //this is bad (brdinfo will have to be recomputed)
 }
 
 static void _ci_update(Pos * pos, move mv)

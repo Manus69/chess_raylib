@@ -1,5 +1,6 @@
 cc = gcc
-obj_dir = ../obj
+flags = -Wall -Wextra -g
+obj_dir = ./obj
 headers = $(wildcard *.h)
 src = $(wildcard *.c)
 objs = $(addprefix $(obj_dir)/,$(src:.c=.o))

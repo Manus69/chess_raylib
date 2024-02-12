@@ -131,6 +131,7 @@ Brd                     Brd_new_after_move(const Brd * brd, move mv);
 
 Pos                     Pos_new_default(void);
 void                    Pos_move(Pos * pos, move mv);
+bool                    Pos_move_legal(const Pos * pos, move mv); 
 
 BrdInfo                 BrdInfo_compute(const Brd * brd);
 bool                    BrdInfo_square_attacked_by_white(const BrdInfo * bi, int idx);
