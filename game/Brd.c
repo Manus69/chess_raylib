@@ -1,122 +1,58 @@
-#include "Game.h"
-#include "../lib/mylib.h"
-#include <string.h>
+#include "_private.h"
 
-int Brd_row_col_idx(int row, int col)
+char * Brd_get(const Brd * brd, int idx)
 {
-    return row * BRD_SIZE + col;
+    return (char *) & brd->cstr[idx];
 }
 
-int Brd_idx_shift(int idx, int n_rows, int n_cols)
+char * Brd_get_rc(const Brd * brd, int row, int col)
 {
-    if (Brd_idx_col(idx) + n_cols < 0) return NO_IDX;
-
-    return idx + n_rows * BRD_SIZE + n_cols;
+    return Brd_get(brd, transform_rc_idx(row, col));
 }
 
-bool Brd_idx_valid(int idx)
+bool Brd_square_empty(const Brd * brd, int idx)
 {
-    return idx >= 0 && idx < BRD_NSQUARES;
+    return * Brd_get(brd, idx) == BRD_ES;
 }
 
-int Brd_idx_row(int idx)
+bool Brd_square_empty_rc(const Brd * brd, int row, int col)
 {
-    return idx / BRD_SIZE;
+    return Brd_square_empty(brd, transform_rc_idx(row, col));
 }
 
-int Brd_idx_col(int idx)
+CLR Brd_clr_at(const Brd * brd, int idx)
 {
-    return idx % BRD_SIZE;
+    return CLR_get(* Brd_get(brd, idx));
 }
 
-bool Brd_last_row(int row)
-{
-    return row == BRD_SIZE - 1;
-}
-
-bool Brd_row_margin2(int row)
-{
-    return row >= BRD_SIZE - 2;
-}
-
-bool Brd_last_col(int col)
-{
-    return col == BRD_SIZE - 1;
-}
-
-bool Brd_col_margin2(int col)
-{
-    return col >= BRD_SIZE - 2;
-}
-
-bool Brd_row_col_valid(int row, int col)
-{
-    return row >= 0 && row < BRD_SIZE && col >= 0 && col < BRD_SIZE;
-}
-
-square * Brd_get(const Brd * brd, int idx)
-{
-    return (square *) brd->board + idx;
-}
-
-square * Brd_get_row_col(const Brd * brd, int row, int col)
-{
-    return Brd_get(brd, Brd_row_col_idx(row, col));
-}
-
-void Brd_set(Brd * brd, int idx, square val)
+void Brd_set(Brd * brd, int idx, char val)
 {
     * Brd_get(brd, idx) = val;
 }
 
-void Brd_set_row_col(Brd * brd, int row, int col, square val)
+void Brd_set_rc(Brd * brd, int row, int col, char val)
 {
-    Brd_set(brd, Brd_row_col_idx(row, col), val);
+    Brd_set(brd, transform_rc_idx(row, col), val);
 }
 
-void Brd_move_idx(Brd * brd, int from, int to)
+void Brd_move_rc(Brd * brd, int from, int to)
 {
-    Brd_set(brd, to, * Brd_get(brd, from));
+    char val;
+
+    val = * Brd_get(brd, from);
+    Brd_set(brd, to, val);
     Brd_set(brd, from, BRD_ES);
 }
 
-void Brd_move(Brd * brd, move mv)
+void Brd_move(Brd * brd, Move mv)
 {
-    Brd_move_idx(brd, move_get_from(mv), move_get_to(mv));
-}
-
-Brd Brd_new_empty(void)
-{
-    Brd brd;
-
-    memset(brd.board, BRD_ES, BRD_NSQUARES);
-    return brd;
+    Brd_move_rc(brd, mv.from, mv.to);
 }
 
 Brd Brd_from_cstr(const char * cstr)
 {
     Brd brd;
 
-    memcpy(brd.board, cstr, BRD_NSQUARES);
+    memcpy(brd.cstr, cstr, BRD_NSQUARES);
     return brd;
-}
-
-Brd Brd_new_default(void)
-{
-    return Brd_from_cstr(BRD_DFLT);
-}
-
-Brd Brd_copy(const Brd * brd)
-{
-    return Brd_from_cstr(brd->board);
-}
-
-Brd Brd_new_after_move(const Brd * brd, move mv)
-{
-    Brd new;
-
-    new = Brd_copy(brd);
-    Brd_move(& new, mv);
-
-    return new;
 }

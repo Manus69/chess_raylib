@@ -1,89 +1,47 @@
-#include "Gui.h"
-#include <stdio.h>
+#include "_private.h"
 
-extern const GuiLayout  GL_DFLT;
 extern const TxLayout   TXL_DFLT;
 
-Gui Gui_init(GuiLayout gl, TxLayout txl, const char * tx_path)
+Gui * Gui_init(int ww, int wh)
 {
-    Gui gui;
+    Gui *   gui;
+    Layout  layout;
 
-    InitWindow(gl.window.width, gl.window.height, "");
+    if ((gui = calloc(1, sizeof(* gui))))
+    {
+        layout = Layout_default(ww, wh);
+        InitWindow(layout.window.width, layout.window.height, "");
 
-    gui.texture = LoadTexture(tx_path);
-    gui.board = Board_init(& gl);
-    gui.gui_layout = gl;
-    gui.tx_layout = txl;
-    gui.input = (Input) {NO_IDX};
+        gui->gui_layout = layout;
+        gui->tx_layout = TXL_DFLT;
+        gui->texture = LoadTexture(GUI_TX_PATH);
+        Gui_add_board(gui);
 
-    return gui;
+        //
+        Gui_add_piece_to_board(gui, 10, GUI_OBJ_BB);
+        //
+
+        return gui;
+    }
+
+    return NULL;
 }
 
 void Gui_kill(Gui * gui)
 {
     UnloadTexture(gui->texture);
     CloseWindow();
+    free(gui);
 }
 
-bool Gui_board_clicked(const Gui * gui, Vector2 xy)
+void Gui_set_board(Gui * gui, const char * cstr, GUI_OBJ (* translate)(char))
 {
-    return CheckCollisionPointRec(xy, gui->gui_layout.board);
-}
+    GUI_OBJ type;
 
-static void _piece_click(Gui * gui, int idx, Vector2 xy)
-{
-    gui->input.active_idx = idx;
-    Piece_move_center(Board_get(& gui->board, idx), xy, gui->input.active_idx);
-}
-
-static void _board_click(Gui * gui, Vector2 xy)
-{
-    int idx;
-
-    if ((idx = Board_piece_hovered(& gui->board, xy)) != NO_IDX) return _piece_click(gui, idx, xy);
-}
-
-static void _click(Gui * gui, Vector2 xy)
-{
-    if (Gui_board_clicked(gui, xy)) _board_click(gui, xy);
-}
-
-static void _button_down(Gui * gui, Vector2 xy)
-{
-    if (gui->input.active_idx != NO_IDX) Piece_move_center(Board_get(& gui->board, gui->input.active_idx), xy, gui->board.square_size / 2);
-}
-
-static void _unclick(Gui * gui)
-{
-    gui->input.active_idx = NO_IDX;
-}
-
-static void _handle_events(Gui * gui)
-{
-    Vector2 xy;
-
-    xy = GetMousePosition();
-
-    if      (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))   _click(gui, xy);
-    else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))  _unclick(gui);
-    else if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))      _button_down(gui, xy);
-}
-
-int Gui_run(void)
-{
-    Gui gui;
-    
-    gui = Gui_init(GL_DFLT, TXL_DFLT, GUI_TX_PATH);
-
-    Board_place(& gui.board, 1, 2, GUI_PC_WK);
-
-    while (! WindowShouldClose())
+    Gui_clear_board(gui);
+    for (int k = 0; k < GUI_GRID_SIZE * GUI_GRID_SIZE; k ++)
     {
-        _handle_events(& gui);
-        render_Gui(& gui);
+        type = translate(cstr[k]);
+        if (type != GUI_OBJ_NONE) Gui_add_piece_to_board(gui, k, type);
     }
-    
-    Gui_kill(& gui);
-
-    return 0;
 }

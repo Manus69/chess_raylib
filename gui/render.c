@@ -1,33 +1,25 @@
-#include "Gui.h"
+#include "_private.h"
 
 #define V_DFLT ((Vector2){})
 #define T_DFLT (RAYWHITE)
 
 void render_board(const Gui * gui)
 {
-    DrawTexturePro(gui->texture, gui->tx_layout.board, gui->gui_layout.board, V_DFLT, 0, T_DFLT);
-}
-
-static void _render_piece(const Gui * gui, int idx)
-{
-    Piece *     pc;
-    Rectangle   rect;
-
-    pc = Board_get(& gui->board, idx);
-    rect = (Rectangle) {pc->xy.x, pc->xy.y, gui->board.square_size, gui->board.square_size};
-
-    DrawTexturePro(gui->texture, gui->tx_layout.piece[pc->type], rect, V_DFLT, 0, T_DFLT);
+    DrawTexturePro(gui->texture, gui->tx_layout.obj[GUI_OBJ_BOARD], gui->repr.board->rect, V_DFLT, 0, T_DFLT);
 }
 
 void render_pieces(const Gui * gui)
 {
-    for (int k = 0; k < gui->board.n_pieces; k ++)
+    Obj * current;
+
+    for (int k = 0; k < gui->store.n_pieces; k ++)
     {
-        _render_piece(gui, k);
+        current = Gui_store_get(gui, k);
+        DrawTexturePro(gui->texture, gui->tx_layout.obj[current->type], current->rect, V_DFLT, 0, T_DFLT);
     }
 }
 
-void render_Gui(const Gui * gui)
+void Gui_render(const Gui * gui)
 {
     BeginDrawing();
     ClearBackground(BLACK);

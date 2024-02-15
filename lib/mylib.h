@@ -7,11 +7,27 @@
 #define NO_IDX      (-1)
 #define nl_         (printf("\n"))
 #define drf_(T)     * (T *)
+#define min(x, y)   ({typeof(x) _x = (x); typeof(y) _y = (y); _x < _y ? _x : _y;})
+#define max(x, y)   ({typeof(x) _x = (x); typeof(y) _y = (y); _x < _y ? _y : _x;})
 
+typedef enum STS    STS;
 typedef uint64_t    u64;
 typedef int64_t     i64;
 typedef uint32_t    u32;
 typedef uint64_t    bfd64;
+
+enum STS
+{
+    STS_fucked,
+    STS_ok,
+};
+
+#define Rslt_(type) \
+typedef struct  Rslt_ ## type \
+{ \
+    type    val; \
+    STS     sts; \
+}               Rslt_ ## type;
 
 bool char_is_lower(char x);
 bool char_is_upper(char x);
