@@ -7,7 +7,7 @@
 #define BRL_IP      (0)
 #define BRR_IP      (BRD_SIZE - 1)
 #define WRR_IP      (BRD_NSQUARES - 1)
-#define WRL_IP      (BRD_WRR_IP - BRD_SIZE + 1)
+#define WRL_IP      (WRR_IP - BRD_SIZE + 1)
 
 static void _left_rook_moved(unsigned char * ci)
 {
@@ -50,5 +50,16 @@ void Pos_update_KRSts(Pos * pos, Move mv)
     char    piece;
 
     clr = Move_clr(mv);
+    piece = Pos_at(pos, mv.to);
 
+    if      (is_king(piece)) _king_moved(& pos->kr_sts.sts[clr]);
+    else if (mv.from == WRL_IP && piece == BRD_WR) _left_rook_moved(& pos->kr_sts.sts[CLR_WHITE]);
+    else if (mv.from == WRR_IP && piece == BRD_WR) _right_rook_moved(& pos->kr_sts.sts[CLR_WHITE]);
+    else if (mv.from == BRL_IP && piece == BRD_BR) _left_rook_moved(& pos->kr_sts.sts[CLR_BLACK]);
+    else if (mv.from == BRR_IP && piece == BRD_BR) _right_rook_moved(& pos->kr_sts.sts[CLR_BLACK]);
+}
+
+KRSts KRSts_default(void)
+{
+    return (KRSts) {};
 }

@@ -27,7 +27,10 @@ typedef struct  Rslt_ ## type \
 { \
     type    val; \
     STS     sts; \
-}               Rslt_ ## type;
+}               Rslt_ ## type; \
+\
+static inline Rslt_ ## type Rslt_ ## type ## _ok(type val) { return (Rslt_ ## type) {val, STS_ok};} \
+static inline Rslt_ ## type Rslt_ ## type ## _fucked(void) { return (Rslt_ ## type) {.sts = STS_fucked};}
 
 bool char_is_lower(char x);
 bool char_is_upper(char x);

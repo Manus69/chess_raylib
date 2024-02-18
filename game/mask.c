@@ -110,3 +110,13 @@ bfd64 Brd_get_square_attack_mask(const Brd * brd, int idx)
 {
     return Brd_get_square_attack_mask_rc(brd, transform_idx_row(idx), transform_idx_col(idx));
 }
+
+bfd64 Pos_get_move_mask_rc(const Pos * pos, int row, int col)
+{
+    
+}
+
+bfd64 Pos_get_move_mask(const Pos * pos, int idx)
+{
+
+}

@@ -15,7 +15,12 @@ bool Move_is_none(Move mv)
     return mv.from == NO_IDX;
 }
 
-CLR Move_clr(Move mv)
+CLR Move_clr_from(Move mv)
+{
+    return CLR_get(mv.from);
+}
+
+CLR Move_clr_to(Move mv)
 {
     return CLR_get(mv.to);
 }

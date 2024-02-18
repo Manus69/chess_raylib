@@ -57,6 +57,7 @@ struct Brd
 struct PosAnal
 {
     bfd64               attack_mask[CLR_COUNT];
+    bfd64               pos_mask[CLR_COUNT];
     char                material[CLR_COUNT];
     char                king_idx[CLR_COUNT];
 };
@@ -72,10 +73,12 @@ struct Pos
     Brd                 brd;
     KRSts               kr_sts;
     Move                last_move;
+    unsigned char       turn;
 };
 
 Rslt_(Pos)
-Pos         Pos_from_cstr(const char * cstr);
+Pos         Pos_new_default(void);
+Pos         Pos_new_from_cstr(const char * cstr, CLR turn, Move last_move, KRSts kr_sts);
 char *      Pos_Brd_get_cstr(const Pos * pos);
 Rslt_Pos    Pos_try_move(const Pos * pos, Move mv);
 

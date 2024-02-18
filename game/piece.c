@@ -36,6 +36,11 @@ bool is_king(char x)
     return x == BRD_WK || x == BRD_BK;
 }
 
+bool is_empty(char x)
+{
+    return x == BRD_ES;
+}
+
 char piece_val(char x)
 {
     return  is_pawn(x) * VAL_PAWN + 

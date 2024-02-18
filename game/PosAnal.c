@@ -2,7 +2,7 @@
 
 PosAnal PosAnal_compute(const Brd * brd)
 {
-    PosAnal pa;
+    PosAnal pa = {};
     CLR     clr;
     char    piece;
 
@@ -13,6 +13,7 @@ PosAnal PosAnal_compute(const Brd * brd)
 
         if (is_king(piece)) pa.king_idx[clr] = k;
 
+        bfd64_set(& pa.pos_mask[clr], k);
         pa.attack_mask[clr] |= Brd_get_square_attack_mask(brd, k);
         pa.material[clr] += piece_val(piece);
     }

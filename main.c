@@ -28,7 +28,7 @@ static int _gui(void)
     GuiSts  sts;
     Pos     pos;
     
-    pos = Pos_from_cstr(BRD_DFLT);
+    pos = Pos_new_default();
     gui = Gui_init(1000, 800);
     Gui_set_board(gui, Pos_Brd_get_cstr(& pos), _translate);
 
